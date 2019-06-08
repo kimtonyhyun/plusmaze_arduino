@@ -13,15 +13,19 @@ classdef PlusMaze < handle
             %------------------------------------------------------------
             p.arm(1).dose = 49;
             p.arm(1).dose_duration = 25; % ms
+            p.arm(1).prox = 48;
             
             p.arm(2).dose = 47;
             p.arm(2).dose_duration = 25;
+            p.arm(2).prox = 46;
             
             p.arm(3).dose = 51;
             p.arm(3).dose_duration = 25;
+            p.arm(3).prox = 50;
             
             p.arm(4).dose = 53;
             p.arm(4).dose_duration = 25;
+            p.arm(4).prox = 52;
             
             p.num_arms = length(p.arm);
 
@@ -38,9 +42,15 @@ classdef PlusMaze < handle
             for i = 1:maze.params.num_arms
                 ar = maze.params.arm(i);
                 maze.a.pinMode(ar.dose, 'output');
+                maze.a.pinMode(ar.prox, 'input');
             end
             
             maze.a.pinMode(maze.params.sync.miniscope_trig, 'output');
+        end
+        
+        function is_present = check_prox(maze, arm_idx)
+            prox_pin = maze.params.arm(arm_idx).prox;
+            is_present = ~maze.a.digitalRead(prox_pin);
         end
         
         % Reward controls
