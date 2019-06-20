@@ -1,5 +1,6 @@
 classdef PlusMaze < handle
     properties (SetAccess=private)
+        center_state
         params
     end
     
@@ -11,6 +12,8 @@ classdef PlusMaze < handle
         function maze = PlusMaze(comPort)
             % Arduino pinout
             %------------------------------------------------------------
+            p.center.step = 24; % Dir is expected to be pin "step"-2
+            
             p.arm(1).dose = 49;
             p.arm(1).dose_duration = 25; % ms
             p.arm(1).prox = 48;
@@ -32,6 +35,7 @@ classdef PlusMaze < handle
             % Synchronization outputs
             p.sync.miniscope_trig = 13;
             
+            maze.center_state = 0;
             maze.params = p;
             
             % Establish access to Arduino
@@ -39,6 +43,9 @@ classdef PlusMaze < handle
             maze.a = arduino(comPort);
 
             % Set up digital pins
+            maze.a.pinMode(maze.params.center.step, 'output');
+            maze.a.pinMode(maze.params.center.step-2, 'output'); % dir
+            
             for i = 1:maze.params.num_arms
                 ar = maze.params.arm(i);
                 maze.a.pinMode(ar.dose, 'output');
@@ -66,19 +73,20 @@ classdef PlusMaze < handle
 %             lick = maze.a.digitalRead(lick_pin);
 %         end
         
-        function target = set_stepper(maze, step_pin, current, target)
-            % FIXME: Adapt to PlusMaze center platform
-            % target == 0: Go to steel plate
-            % target == 0.5: 90 deg
-            % target == 1: Go to mesh
+        function set_center(maze, target)
+            % Target may be: 0, 0.5, 1, 1.5
             target = max(0, target); % If target < 0, set to 0
-            target = min(1, target); % If target > 1, set to 1
+            target = min(1.5, target); % If target > 1.5, set to 1.5
             
+            step_pin = maze.params.center.step;
+            current = maze.center_state;
             if (target ~= current)
                 direction = (target > current);
                 num_90degs = abs(target-current)*2;
                 maze.a.rotate_stepper(step_pin, direction, num_90degs);
             end
+            
+            maze.center_state = target;
         end
         
         % Synchronization

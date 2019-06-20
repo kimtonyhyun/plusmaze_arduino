@@ -344,4 +344,3 @@ void loop() {
   } /* end if serial available                               */
   
 } /* end loop statement                                      */
-
