@@ -15,19 +15,23 @@ classdef PlusMaze < handle
             p.center.step = 24; % Dir is expected to be pin "step"-2
             
             p.arm(1).dose = 49;
-            p.arm(1).dose_duration = 25; % ms
+            p.arm(1).dose_duration = 3; % ms
+            p.arm(1).num_pulses = 3;
             p.arm(1).prox = 48;
             
             p.arm(2).dose = 47;
-            p.arm(2).dose_duration = 25;
+            p.arm(2).dose_duration = 3;
+            p.arm(2).num_pulses = 3;
             p.arm(2).prox = 46;
             
             p.arm(3).dose = 51;
-            p.arm(3).dose_duration = 25;
+            p.arm(3).dose_duration = 3;
+            p.arm(3).num_pulses = 3;
             p.arm(3).prox = 50;
             
             p.arm(4).dose = 53;
-            p.arm(4).dose_duration = 25;
+            p.arm(4).dose_duration = 3;
+            p.arm(4).num_pulses = 3;
             p.arm(4).prox = 52;
             
             p.num_arms = length(p.arm);
@@ -62,10 +66,26 @@ classdef PlusMaze < handle
         
         % Reward controls
         %------------------------------------------------------------
-        function dose(maze, arm_idx)
+        function dose(maze, arm_idx, dose_duration, num_pulses)
+            if ~exist('dose_duration', 'var') % Use default
+                dose_duration = maze.params.arm(arm_idx).dose_duration;
+            end
+            if ~exist('num_pulses', 'var')
+                num_pulses = maze.params.arm(arm_idx).num_pulses;
+            end
+            
             dose_pin = maze.params.arm(arm_idx).dose;
-            dose_duration = maze.params.arm(arm_idx).dose_duration;
-            maze.a.send_pulse(dose_pin, dose_duration);
+            for k = 1:num_pulses
+                maze.a.send_pulse(dose_pin, dose_duration);
+                pause(0.01);
+            end
+        end
+        
+        function prime(maze, arm_idx)
+            dose_pin = maze.params.arm(arm_idx).dose;
+            maze.a.digitalWrite(dose_pin, 1);
+            pause(1); % seconds
+            maze.a.digitalWrite(dose_pin, 0);
         end
         
 %         function lick = is_licking(maze, track_idx)
