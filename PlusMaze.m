@@ -64,6 +64,13 @@ classdef PlusMaze < handle
             is_present = ~maze.a.digitalRead(prox_pin);
         end
         
+        function all_prox = check_all_prox(maze)
+            all_prox = false(1, maze.params.num_arms);
+            for k = 1:length(all_prox)
+                all_prox(k) = maze.check_prox(k);
+            end
+        end
+        
         % Reward controls
         %------------------------------------------------------------
         function dose(maze, arm_idx, dose_duration, num_pulses)
