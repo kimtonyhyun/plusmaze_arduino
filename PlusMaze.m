@@ -89,10 +89,16 @@ classdef PlusMaze < handle
         end
         
         function prime(maze, arm_idx)
-            dose_pin = maze.params.arm(arm_idx).dose;
-            maze.a.digitalWrite(dose_pin, 1);
-            pause(1); % seconds
-            maze.a.digitalWrite(dose_pin, 0);
+            % "Fast" prime
+%             dose_pin = maze.params.arm(arm_idx).dose;
+%             maze.a.digitalWrite(dose_pin, 1);
+%             pause(1); % seconds
+%             maze.a.digitalWrite(dose_pin, 0);
+
+            for k = 1:50
+                maze.dose(arm_idx);
+                pause(0.01);
+            end
         end
         
 %         function lick = is_licking(maze, track_idx)
