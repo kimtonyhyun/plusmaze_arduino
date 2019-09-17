@@ -14,25 +14,29 @@ classdef PlusMaze < handle
             %------------------------------------------------------------
             p.center.step = 24; % Dir is expected to be pin "step"-2
             
-            p.arm(1).dose = 49;
-            p.arm(1).dose_duration = 3; % ms
+            p.arm(1).dose = 53;
+            p.arm(1).dose_duration = 4; % ms
             p.arm(1).num_pulses = 3;
-            p.arm(1).prox = 48;
+            p.arm(1).prox = 46;
+            p.arm(1).lick = 43;
             
             p.arm(2).dose = 47;
             p.arm(2).dose_duration = 3;
             p.arm(2).num_pulses = 3;
-            p.arm(2).prox = 46;
+            p.arm(2).prox = 48;
+            p.arm(2).lick = 39;
             
-            p.arm(3).dose = 51;
+            p.arm(3).dose = 49;
             p.arm(3).dose_duration = 3;
             p.arm(3).num_pulses = 3;
             p.arm(3).prox = 50;
+            p.arm(3).lick = 41;
             
-            p.arm(4).dose = 53;
+            p.arm(4).dose = 51;
             p.arm(4).dose_duration = 3;
             p.arm(4).num_pulses = 3;
             p.arm(4).prox = 52;
+            p.arm(4).lick = 45;
             
             p.num_arms = length(p.arm);
 
@@ -54,6 +58,7 @@ classdef PlusMaze < handle
                 ar = maze.params.arm(i);
                 maze.a.pinMode(ar.dose, 'output');
                 maze.a.pinMode(ar.prox, 'input');
+                maze.a.pinMode(ar.lick, 'input');
             end
             
             maze.a.pinMode(maze.params.sync.miniscope_trig, 'output');
@@ -69,6 +74,11 @@ classdef PlusMaze < handle
             for k = 1:length(all_prox)
                 all_prox(k) = maze.check_prox(k);
             end
+        end
+        
+        function is_licking = check_lick(maze, arm_idx)
+            lick_pin = maze.params.arm(arm_idx).lick;
+            is_licking = maze.a.digitalRead(lick_pin);
         end
         
         % Reward controls
